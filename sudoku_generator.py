@@ -12,11 +12,12 @@ import random
 
 def build_row_of_sudoku_cells():
     # got rid of duplicates by explicitly defining
-    #the list items, instead of generating one integer at a time
+    # the list items, instead of generating one integer at a time
     sudoku_row = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     random.shuffle(sudoku_row)
     return sudoku_row
 
+#make a row of 9 cells with cell walls.
 def sudoku_row_as_text_string():
     row_as_string_variable = ""
     row_as_integer_list = build_row_of_sudoku_cells()
@@ -25,7 +26,10 @@ def sudoku_row_as_text_string():
     row_as_string_variable = row_as_string_variable + "|"
     return row_as_string_variable
 
+#repeat the row 9 times
 for i in range (horizontal_cell_count):
     row_string = sudoku_row_as_text_string()
     print(row_string)
     print("-" * text_cells_in_ascii_grid)
+
+print("Sudoku Generator Finished!")
