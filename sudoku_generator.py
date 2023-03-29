@@ -5,7 +5,7 @@ print("Sudoku Generator Starting Up!")
 # and border spots for pipes.
 horizontal_cell_count = 9
 text_cells_in_ascii_grid = (4 * horizontal_cell_count +1)
-vertical_border_character = "_"
+vertical_border_character = "-"
 
 print(vertical_border_character * text_cells_in_ascii_grid)
 
