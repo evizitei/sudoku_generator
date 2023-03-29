@@ -5,8 +5,9 @@ print("Sudoku Generator Starting Up!")
 # and border spots for pipes.
 horizontal_cell_count = 9
 text_cells_in_ascii_grid = (4 * horizontal_cell_count +1)
+vertical_border_character = "_"
 
-print("-" * text_cells_in_ascii_grid)
+print(vertical_border_character * text_cells_in_ascii_grid)
 
 # moved where it makes more sense
 import random
@@ -34,6 +35,6 @@ def sudoku_row_as_text_string():
 for i in range (horizontal_cell_count):
     row_string = sudoku_row_as_text_string()
     print(row_string)
-    print("-" * text_cells_in_ascii_grid)
+    print(vertical_border_character * text_cells_in_ascii_grid)
 
 print("Sudoku Generator Finished!")
