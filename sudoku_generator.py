@@ -1,4 +1,3 @@
-
 print("Sudoku Generator Starting Up!")
 
 horizontal_cell_count = 9
@@ -7,18 +6,18 @@ vertical_border_character = "-"
 
 import random
 
-sudoku_grid = []
-
-for i in range(9):
-    sudoku_grid.append([0] * 9)
+# changed to list comprehension that generates
+# a list that contains nine lists of nine zeroes
+sudoku_grid = [[0]*9 for x in range(9)]
 
 def conflict_exists(grid, val, row, col):
     list_for_row = grid[row]
     if val in list_for_row:
         return True
-    list_for_col = []
-    for row_num in range(9):
-        list_for_col.append(grid[row_num][col])
+    # changed to list comprehension that generates
+    # a list containing all the numebrs at a specific
+    # index for each of the nine rows
+    list_for_col = [grid[row_num][col] for row_num in range(9)]
     if val in list_for_col:
         return True
     return False
