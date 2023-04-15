@@ -1,5 +1,6 @@
 
 print("Sudoku Generator Starting Up!")
+print("MOST RECENT CHANGE")
 
 # one for each character position, space margins around them,
 # and border spots for pipes.
