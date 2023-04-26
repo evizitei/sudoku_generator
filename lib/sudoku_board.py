@@ -22,6 +22,9 @@ class SudokuCell:
         self.block = get_block_for_coordinates(r, col)
         self.value = val
         self.available_values = [1,2,3,4,5,6,7,8,9]
+    
+    def assign(self, new_value):
+        self.value = new_value
 
 class SudokuBoard:
     def __init__(self):
@@ -43,7 +46,7 @@ class SudokuBoard:
             return True
         return False
     
-    def get_elements_for_sudoku_block(self, block_number):
+    def get_cells_for_sudoku_block(self, block_number):
         #
         # block 1
         #  grid[0][0:3] + grid[1][0:3] + grid[2][0:3]
@@ -55,8 +58,12 @@ class SudokuBoard:
         #  grid[6][0:3] + grid[7][0:3] + grid[8][0:3]
         row_offset = ((block_number - 1) // 3) * 3
         col_offset = ((block_number - 1) %3) * 3
-        row_of_cells = self.grid[row_offset][col_offset:col_offset + 3] + self.grid[row_offset + 1][col_offset:col_offset + 3] + self.grid[row_offset + 2][col_offset:col_offset + 3]
-        return [cell.value for cell in row_of_cells]
+        list_of_cells = self.grid[row_offset][col_offset:col_offset + 3] + self.grid[row_offset + 1][col_offset:col_offset + 3] + self.grid[row_offset + 2][col_offset:col_offset + 3]
+        return list_of_cells
+    
+    def get_elements_for_sudoku_block(self, block_number):
+        cells = self.get_cells_for_sudoku_block(block_number)
+        return [c.value for c in cells]
   
     def is_conflict_in_subgrid(self, val, row, col):
       block_number = get_block_for_coordinates(row, col)
@@ -74,6 +81,24 @@ class SudokuBoard:
             return True
         return False
 
+    def propogate_constraints(self, row, col, new_value):
+        # propogate row
+        for i in range(9):
+            cell = self.grid[row][i]
+            cell.available_values.remove(new_value) 
+        # propogate col
+        for i in range(9):
+            cell = self.grid[i][col]
+            cell.available_values.remove(new_value)
+        # propogate block
+        block_num = get_block_for_coordinates(row, col)
+        block_cells = self.get_cells_for_sudoku_block(block_num)
+        for cell in block_cells:
+            cell.available_values.remove(new_value)
+        target_cell = self.grid[row][col]
+        target_cell.available_values = []
+        
+
     def assign_viable_value(self, row, col):
         proposed_value = 0
         cutoff_attempts = 20
@@ -83,4 +108,16 @@ class SudokuBoard:
             attempts += 1
         if attempts == 20:
             proposed_value = 0
-        self.grid[row][col].value = proposed_value
+        # old version:
+        # self.grid[row][col].value = proposed_value
+        cell_in_question = self.grid[row][col]
+        cell_in_question.assign(proposed_value)
+        self.propogate_constraints(row, col, cell_in_question.value)
+      
+    def cells_with_one_option(self):
+        easy_options = []
+        for row in self.grid:
+            for cell in row:
+                if(len(cell.available_options) == 1):
+                    easy_options.add(cell)
+        return easy_options
