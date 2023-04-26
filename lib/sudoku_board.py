@@ -15,18 +15,30 @@ def get_block_for_coordinates(row, col):
     return ((row // 3) * 3 + 1) + (col // 3)
 
 
+class SudokuCell:
+    def __init__(self, r, col, val=0):
+        self.row = r
+        self.column = col
+        self.block = get_block_for_coordinates(r, col)
+        self.value = val
+        self.available_values = [1,2,3,4,5,6,7,8,9]
+
 class SudokuBoard:
-    def __init__(self, default_value=0):
-        self.grid = [[default_value]*9 for x in range(9)]
+    def __init__(self):
+        self.grid = [[0]*9 for x in range(9)]
+        for row in range(9):
+            for col in range(9):
+                self.grid[row][col] = SudokuCell(row, col)
+        
 
     def is_conflict_in_row(self, val, row):
-        list_for_row = self.grid[row]
+        list_for_row = [cell.value for cell in self.grid[row]]
         if val in list_for_row:
             return True
         return False
     
     def is_conflict_in_column(self, val, col):
-        list_for_col = [self.grid[row_num][col] for row_num in range(9)]
+        list_for_col = [self.grid[row_num][col].value for row_num in range(9)]
         if val in list_for_col:
             return True
         return False
@@ -43,7 +55,8 @@ class SudokuBoard:
         #  grid[6][0:3] + grid[7][0:3] + grid[8][0:3]
         row_offset = ((block_number - 1) // 3) * 3
         col_offset = ((block_number - 1) %3) * 3
-        return self.grid[row_offset][col_offset:col_offset + 3] + self.grid[row_offset + 1][col_offset:col_offset + 3] + self.grid[row_offset + 2][col_offset:col_offset + 3]
+        row_of_cells = self.grid[row_offset][col_offset:col_offset + 3] + self.grid[row_offset + 1][col_offset:col_offset + 3] + self.grid[row_offset + 2][col_offset:col_offset + 3]
+        return [cell.value for cell in row_of_cells]
   
     def is_conflict_in_subgrid(self, val, row, col):
       block_number = get_block_for_coordinates(row, col)
@@ -70,4 +83,4 @@ class SudokuBoard:
             attempts += 1
         if attempts == 20:
             proposed_value = 0
-        self.grid[row][col] = proposed_value
+        self.grid[row][col].value = proposed_value

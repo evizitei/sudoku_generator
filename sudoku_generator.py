@@ -10,8 +10,8 @@ board = SudokuBoard()
 
 def sudoku_row_as_text_string(row_as_integer_list):
     row_as_string_variable = ""
-    for cell_value in row_as_integer_list:
-        row_as_string_variable = row_as_string_variable + "| " + str(cell_value) + " "
+    for cell in row_as_integer_list:
+        row_as_string_variable = row_as_string_variable + "| " + str(cell.value) + " "
     row_as_string_variable = row_as_string_variable + "|"
     return row_as_string_variable
 
