@@ -25,6 +25,11 @@ class SudokuCell:
     
     def assign(self, new_value):
         self.value = new_value
+        self.available_values = []
+    
+    def constrain(self, canceled_value):
+        if canceled_value in self.available_values:
+            self.available_values.remove(canceled_value)
 
 class SudokuBoard:
     def __init__(self):
@@ -32,7 +37,21 @@ class SudokuBoard:
         for row in range(9):
             for col in range(9):
                 self.grid[row][col] = SudokuCell(row, col)
-        
+    
+    def not_solved(self):
+        for row in self.grid:
+            for cell in row:
+                if cell.value == 0:
+                    return True
+        return False
+    
+    def not_stuck(self):
+        for row in self.grid:
+            for cell in row:
+                if cell.value == 0 and len(cell.available_values) == 0:
+                    return False
+        return True
+
 
     def is_conflict_in_row(self, val, row):
         list_for_row = [cell.value for cell in self.grid[row]]
@@ -85,20 +104,18 @@ class SudokuBoard:
         # propogate row
         for i in range(9):
             cell = self.grid[row][i]
-            cell.available_values.remove(new_value) 
+            cell.constrain(new_value)
         # propogate col
         for i in range(9):
             cell = self.grid[i][col]
-            cell.available_values.remove(new_value)
+            cell.constrain(new_value)
         # propogate block
         block_num = get_block_for_coordinates(row, col)
         block_cells = self.get_cells_for_sudoku_block(block_num)
         for cell in block_cells:
-            cell.available_values.remove(new_value)
-        target_cell = self.grid[row][col]
-        target_cell.available_values = []
+            cell.constrain(new_value)
         
-
+    """
     def assign_viable_value(self, row, col):
         proposed_value = 0
         cutoff_attempts = 20
@@ -113,11 +130,31 @@ class SudokuBoard:
         cell_in_question = self.grid[row][col]
         cell_in_question.assign(proposed_value)
         self.propogate_constraints(row, col, cell_in_question.value)
+    """
+    def assign_value(self, cell, value):
+        cell.assign(value)
+        self.propogate_constraints(cell.row, cell.column, cell.value)
+
+
       
     def cells_with_one_option(self):
         easy_options = []
         for row in self.grid:
             for cell in row:
-                if(len(cell.available_options) == 1):
-                    easy_options.add(cell)
+                if(len(cell.available_values) == 1):
+                    easy_options.append(cell)
         return easy_options
+    
+    def select_cell_with_fewest_options(self):
+        lowest_non_zero_choice = 9
+        for row in self.grid:
+            for cell in row:
+                choices = len(cell.available_values)
+                if(choices > 0 and choices < lowest_non_zero_choice):
+                    lowest_non_zero_choice = choices
+        elgible_cells = []
+        for row in self.grid:
+            for cell in row:
+                if(len(cell.available_values) == lowest_non_zero_choice):
+                    elgible_cells.append(cell)
+        return random.choice(elgible_cells)

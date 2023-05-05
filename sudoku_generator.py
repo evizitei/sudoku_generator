@@ -1,4 +1,5 @@
 from lib.sudoku_board import SudokuBoard
+import random
 
 print("Sudoku Generator Starting Up!")
 
@@ -19,14 +20,19 @@ def sudoku_row_as_text_string(row_as_integer_list):
 #    for col in range(9):
 #        board.assign_viable_value(row, col)
 
-while grid.not_solved():
-    easy_options = grid.cells_with_one_option()
+while board.not_solved() and board.not_stuck():
+    easy_options = board.cells_with_one_option()
     if len(easy_options) > 0:
-        cell = easy_options[0]
-        grid.assign_value(cell.row, cell.col, cell.available_values[0])
+        cell = random.choice(easy_options)
+        board.assign_value(cell, cell.available_values[0])
     else:
-        # pick one with few options, choose one at randmo,
-        # backtrack if necessary
+        # TODO: Right now this does no backtracking,
+        # but it will for sure get lodged at some point in most solves.
+        cell = board.select_cell_with_fewest_options()
+        board.assign_value(cell, random.choice(cell.available_values))
+
+if not board.not_stuck():
+    print("Bummer! Stuck before we could fully solve")
 
 print(vertical_border_character * text_cells_in_ascii_grid)
 for i in range(9):
