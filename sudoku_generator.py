@@ -32,10 +32,16 @@ if not board.not_stuck():
     # TODO: Option: instead of backgtracking, we could put in a loop here that 
     # regenerates the board from scratch up to 100 times to try to get a non-stuck version.
 
+
+# TODO: This is the place we would start deciding WHICH CELLS NOT TO PRINT
+# in order to actually make this a puzzle that humans could solve.
+# Maybe start by just picking 18 cells at random and choosing not to print their value?
+# Might require re-working how the printing below works
 print(vertical_border_character * text_cells_in_ascii_grid)
 for i in range(9):
     row_string = sudoku_row_as_text_string(board.grid[i])
     print(row_string)
     print(vertical_border_character * text_cells_in_ascii_grid)
+
 
 print("Sudoku Generator Finished!")
