@@ -1,95 +1,47 @@
+from lib.sudoku_board import SudokuBoard
+import random
+
 print("Sudoku Generator Starting Up!")
 
 horizontal_cell_count = 9
 text_cells_in_ascii_grid = (4 * horizontal_cell_count +1)
 vertical_border_character = "-"
 
-import random
-
-sudoku_grid = [[0]*9 for x in range(9)]
-
-def is_conflict_in_row(grid, val, row):
-    list_for_row = grid[row]
-    if val in list_for_row:
-        return True
-    return False
-
-def is_conflict_in_column(grid, val, col):
-    list_for_col = [grid[row_num][col] for row_num in range(9)]
-    if val in list_for_col:
-        return True
-    return False
-
-def get_block_for_coordinates(row, col):
-    # this should be a block number 1 through 9
-    #
-    # ORDER (each number is 3x3)
-    #   1  2  3
-    #   4  5  6
-    #   7  8  9
-    #
-    #  row = 0, col = 0 => block = 1
-    #  row = 1, col = 0 => block = 1
-    #  row = 8, col = 8 => block = 9
-    #  row = 4, col = 2 => block = 4
-    return ((row // 3) * 3 + 1) + (col // 3)
-
-def get_elements_for_sudoku_block(grid, block_number):
-    #
-    # block 1
-    #  grid[0][0:3] + grid[1][0:3] + grid[2][0:3]
-    # block 2
-    #  grid[0][3:6] + grid[1][3:6] + grid[2][3:6]
-    # block 4
-    #  grid[3][0:3] + grid[4][0:3] + grid[5][0:3]
-    # block 7
-    #  grid[6][0:3] + grid[7][0:3] + grid[8][0:3]
-    row_offset = ((block_number - 1) // 3) * 3
-    col_offset = ((block_number - 1) %3) * 3
-    return grid[row_offset][col_offset:col_offset + 3] + grid[row_offset + 1][col_offset:col_offset + 3] + grid[row_offset + 2][col_offset:col_offset + 3]
-
-def is_conflict_in_subgrid(grid, val, row, col):
-    block_number = get_block_for_coordinates(row, col)
-    list_for_subgrid = get_elements_for_sudoku_block(grid, block_number)
-    if val in list_for_subgrid:
-        return True
-    return False
-
-def conflict_exists(grid, val, row, col):
-    if is_conflict_in_row(grid, val, row):
-        return True
-    if is_conflict_in_column(grid, val, col):
-        return True
-    if is_conflict_in_subgrid(grid, val, row, col):
-        return True
-    return False
-
-def generate_viable_value(grid, row, col):
-    proposed_value = 0
-    cutoff_attempts = 20
-    attempts = 0
-    while conflict_exists(grid, proposed_value, row, col) and attempts < cutoff_attempts:
-        proposed_value = random.randrange(1,10)
-        attempts += 1
-    if attempts == 20:
-        proposed_value = 0
-    grid[row][col] = proposed_value
+board = SudokuBoard()
 
 def sudoku_row_as_text_string(row_as_integer_list):
     row_as_string_variable = ""
-    for cell_value in row_as_integer_list:
-        row_as_string_variable = row_as_string_variable + "| " + str(cell_value) + " "
+    for cell in row_as_integer_list:
+        row_as_string_variable = row_as_string_variable + "| " + str(cell.value) + " "
     row_as_string_variable = row_as_string_variable + "|"
     return row_as_string_variable
 
-for row in range(9):
-    for col in range(9):
-        generate_viable_value(sudoku_grid, row, col)
+while board.not_solved() and board.not_stuck():
+    easy_options = board.cells_with_one_option()
+    if len(easy_options) > 0:
+        cell = random.choice(easy_options)
+        board.assign_value(cell, cell.available_values[0])
+    else:
+        # TODO: Right now this does no backtracking,
+        # but it will for sure get lodged at some point in most solves.
+        cell = board.select_cell_with_fewest_options()
+        board.assign_value(cell, random.choice(cell.available_values))
 
+if not board.not_stuck():
+    print("Bummer! Stuck before we could fully solve")
+    # TODO: Option: instead of backgtracking, we could put in a loop here that 
+    # regenerates the board from scratch up to 100 times to try to get a non-stuck version.
+
+
+# TODO: This is the place we would start deciding WHICH CELLS NOT TO PRINT
+# in order to actually make this a puzzle that humans could solve.
+# Maybe start by just picking 18 cells at random and choosing not to print their value?
+# Might require re-working how the printing below works
 print(vertical_border_character * text_cells_in_ascii_grid)
 for i in range(9):
-    row_string = sudoku_row_as_text_string(sudoku_grid[i])
+    row_string = sudoku_row_as_text_string(board.grid[i])
     print(row_string)
     print(vertical_border_character * text_cells_in_ascii_grid)
+
 
 print("Sudoku Generator Finished!")
