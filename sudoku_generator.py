@@ -9,6 +9,16 @@ vertical_border_character = "-"
 
 board = SudokuBoard()
 
+def generate_board_values(board):
+    while board.not_solved() and board.not_stuck():
+        easy_options = board.cells_with_one_option()
+        if len(easy_options) > 0:
+            cell = random.choice(easy_options)
+            board.assign_value(cell, cell.available_values[0])
+        else:
+            cell = board.select_cell_with_fewest_options()
+            board.assign_value(cell, random.choice(cell.available_values))
+
 def sudoku_row_as_text_string(row_as_integer_list):
     row_as_string_variable = ""
     for cell in row_as_integer_list:
@@ -16,21 +26,17 @@ def sudoku_row_as_text_string(row_as_integer_list):
     row_as_string_variable = row_as_string_variable + "|"
     return row_as_string_variable
 
-while board.not_solved() and board.not_stuck():
-    easy_options = board.cells_with_one_option()
-    if len(easy_options) > 0:
-        cell = random.choice(easy_options)
-        board.assign_value(cell, cell.available_values[0])
-    else:
-        # TODO: Right now this does no backtracking,
-        # but it will for sure get lodged at some point in most solves.
-        cell = board.select_cell_with_fewest_options()
-        board.assign_value(cell, random.choice(cell.available_values))
+generate_board_values(board)
 
-if not board.not_stuck():
-    print("Bummer! Stuck before we could fully solve")
-    # TODO: Option: instead of backgtracking, we could put in a loop here that 
-    # regenerates the board from scratch up to 100 times to try to get a non-stuck version.
+# loop to regen the board up to 100 times when it gets stuck
+while not board.not_stuck():
+    cut_off_attempts = 100
+    attempts = 0
+    board = SudokuBoard()
+    generate_board_values(board)
+    attempts +=1
+    if attempts == 100:
+        print("Bummer! Stuck before we could fully solve")
 
 
 # TODO: This is the place we would start deciding WHICH CELLS NOT TO PRINT
