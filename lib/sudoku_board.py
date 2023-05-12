@@ -22,6 +22,7 @@ class SudokuCell:
         self.block = get_block_for_coordinates(r, col)
         self.value = val
         self.available_values = [1,2,3,4,5,6,7,8,9]
+        self.print_empty = False
     
     def assign(self, new_value):
         self.value = new_value
@@ -30,6 +31,11 @@ class SudokuCell:
     def constrain(self, canceled_value):
         if canceled_value in self.available_values:
             self.available_values.remove(canceled_value)
+    
+    def print_value(self):
+        if self.print_empty == False:
+            return self.value
+        return " "
 
 class SudokuBoard:
     def __init__(self):
@@ -115,28 +121,12 @@ class SudokuBoard:
         for cell in block_cells:
             cell.constrain(new_value)
         
-    """
-    def assign_viable_value(self, row, col):
-        proposed_value = 0
-        cutoff_attempts = 20
-        attempts = 0
-        while self.conflict_exists(proposed_value, row, col) and attempts < cutoff_attempts:
-            proposed_value = random.randrange(1,10)
-            attempts += 1
-        if attempts == 20:
-            proposed_value = 0
-        # old version:
-        # self.grid[row][col].value = proposed_value
-        cell_in_question = self.grid[row][col]
-        cell_in_question.assign(proposed_value)
-        self.propogate_constraints(row, col, cell_in_question.value)
-    """
+    
     def assign_value(self, cell, value):
         cell.assign(value)
         self.propogate_constraints(cell.row, cell.column, cell.value)
 
-
-      
+    
     def cells_with_one_option(self):
         easy_options = []
         for row in self.grid:
@@ -158,3 +148,11 @@ class SudokuBoard:
                 if(len(cell.available_values) == lowest_non_zero_choice):
                     elgible_cells.append(cell)
         return random.choice(elgible_cells)
+    
+    def choose_empty_cells(self):
+        number_of_puzzle_cells = 45
+        for i in range(number_of_puzzle_cells):
+            random_row = random.randrange(0,9)
+            random_cell = random.randrange(0,9)
+            empty_cell = self.grid[random_row][random_cell]
+            empty_cell.print_empty = True

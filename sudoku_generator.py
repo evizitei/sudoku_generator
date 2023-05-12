@@ -22,7 +22,7 @@ def generate_board_values(board):
 def sudoku_row_as_text_string(row_as_integer_list):
     row_as_string_variable = ""
     for cell in row_as_integer_list:
-        row_as_string_variable = row_as_string_variable + "| " + str(cell.value) + " "
+        row_as_string_variable = row_as_string_variable + "| " + str(cell.print_value()) + " "
     row_as_string_variable = row_as_string_variable + "|"
     return row_as_string_variable
 
@@ -38,11 +38,8 @@ while not board.not_stuck():
     if attempts == 100:
         print("Bummer! Stuck before we could fully solve")
 
+board.choose_empty_cells()
 
-# TODO: This is the place we would start deciding WHICH CELLS NOT TO PRINT
-# in order to actually make this a puzzle that humans could solve.
-# Maybe start by just picking 18 cells at random and choosing not to print their value?
-# Might require re-working how the printing below works
 print(vertical_border_character * text_cells_in_ascii_grid)
 for i in range(9):
     row_string = sudoku_row_as_text_string(board.grid[i])
