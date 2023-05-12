@@ -150,9 +150,11 @@ class SudokuBoard:
         return random.choice(elgible_cells)
     
     def choose_empty_cells(self):
-        number_of_puzzle_cells = 45
-        for i in range(number_of_puzzle_cells):
-            random_row = random.randrange(0,9)
-            random_cell = random.randrange(0,9)
-            empty_cell = self.grid[random_row][random_cell]
-            empty_cell.print_empty = True
+        all_cells = []
+        number_of_puzzle_cells = 36
+        for row in self.grid:
+            for cell in row:
+                all_cells.append(cell)
+        empty_cells = random.sample(all_cells, k = number_of_puzzle_cells)
+        for cell in empty_cells:            
+            cell.print_empty = True    
